@@ -70,3 +70,6 @@ typings/
 
 # ENV files
 .env
+
+# Application DATA
+.docker/elasticdata
