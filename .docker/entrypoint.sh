@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! -d ".docker/elasticdata" ]; then
+ mkdir -p .docker/elasticdata
+ chmod -R 777 .docker/elasticdata
+fi
+
 cd /home/node/app
 
 npm install

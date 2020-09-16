@@ -8,6 +8,7 @@ export class Esv7DataSource extends juggler.DataSource
   static dataSourceName = 'esv7';
 
   constructor() {
+    console.log(config);
     super(config);
   }
 

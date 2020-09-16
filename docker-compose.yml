@@ -14,8 +14,7 @@ services:
     networks:
       - network_video-catalog-api
       - network_video-catalog-rabbitmq
-    depends_on:
-      - elasticsearch
+
   elasticsearch:
     build: ./.docker/elasticsearch
     container_name: "video-catalog-elasticsearch"
@@ -27,6 +26,8 @@ services:
       - 9200:9200
     networks:
       - network_video-catalog-api
+    depends_on:
+      - app
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.5.1
