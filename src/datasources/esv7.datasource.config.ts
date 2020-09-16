@@ -11,7 +11,5 @@ export default {
         "requestTimeout": process.env.ELASTIC_SEARCH_REQUEST_TIMEOUT,
         "pingTimeout": process.env.ELASTIC_SEARCH_PING_TIMEOUT
     },
-    "mappingProperties": {
-
-    }
+    "mappingProperties": {}
 }

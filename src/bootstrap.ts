@@ -1,4 +1,6 @@
-import {config as loadenv} from 'dotenv';
-import {join} from 'path';
+import path from 'path';
+import { config as loadEnv } from 'dotenv';
 
-loadenv({path: join(__dirname, '../.env')});
+loadEnv({
+    path: path.resolve(__dirname, '..', '.env'),
+});

@@ -73,3 +73,5 @@ typings/
 
 # Application DATA
 .docker/elasticdata
+
+.devcontainer
