@@ -64,6 +64,10 @@ export class PingController {
       id: String(Date.now()),
       name: `My category ${Date.now()}`,
       description: `My description ${Date.now()}`,
+    }).then((a) => {
+      console.log(a);
+    }).catch((e) => {
+      console.log(e);
     });
 
     return this.categoryRepository.find();
