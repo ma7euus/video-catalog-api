@@ -35,11 +35,8 @@ const PING_RESPONSE: ResponseObject = {
  */
 export class PingController {
   constructor(
-      @inject(RestBindings.Http.REQUEST)
-      private req: Request,
-
-      @repository(CategoryRepository)
-      private categoryRepository: CategoryRepository,
+      @inject(RestBindings.Http.REQUEST) private req: Request,
+      @repository(CategoryRepository) private categoryRepository: CategoryRepository,
   ) {}
 
   // Map to `GET /ping`
@@ -64,12 +61,7 @@ export class PingController {
       id: String(Date.now()),
       name: `My category ${Date.now()}`,
       description: `My description ${Date.now()}`,
-    }).then((a) => {
-      console.log(a);
-    }).catch((e) => {
-      console.log(e);
     });
-
     return this.categoryRepository.find();
   }
 }
