@@ -60,7 +60,10 @@ export class PingController {
     await this.categoryRepository.create({
       id: String(Date.now()),
       name: `My category ${Date.now()}`,
-      description: `My description ${Date.now()}`,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      created_at: new Date(),
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      updated_at: new Date(),
     });
     return this.categoryRepository.find();
   }

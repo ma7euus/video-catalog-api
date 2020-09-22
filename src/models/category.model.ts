@@ -1,6 +1,6 @@
 import {Entity, model, property} from '@loopback/repository';
 
-@model({settings: {strict: false}})
+@model()
 export class Category extends Entity {
 
     @property({
@@ -18,14 +18,26 @@ export class Category extends Entity {
     name: string;
 
     @property({
-        type: 'string',
+        type: 'boolean',
+        required: false
     })
-    description?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+    is_active: boolean = true;
 
-    // Define well-known properties here
+    @property({
+        type: 'date',
+        required: true
+    })
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+    created_at: Date;
 
-    // Indexer property to allow additional data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    @property({
+        type: 'date',
+        required: true
+    })
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+    updated_at: Date;
+
     [prop: string]: any;
 
     constructor(data?: Partial<Category>) {
