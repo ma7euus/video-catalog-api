@@ -13,7 +13,7 @@ services:
       - .:/home/node/app
     networks:
       - network_video-catalog-api
-     # - network_video-catalog-rabbitmq
+      - network_video-catalog-rabbitmq
 
   elasticsearch:
     build: ./.docker/elasticsearch
@@ -42,5 +42,5 @@ services:
 networks:
   network_video-catalog-api:
     driver: bridge
-  #network_video-catalog-rabbitmq:
-   # external: true
+  network_video-catalog-rabbitmq:
+    external: true
