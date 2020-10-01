@@ -20,7 +20,7 @@ export class RabbitmqServer extends Context implements Server {
         console.log('Starting Rabbitmq connection...');
         await connect({
             hostname: process.env.RABBITMQ_SERVER_HOST,
-            port: process.env.RABBITMQ_SERVER_PORT,
+            //port: process.env.RABBITMQ_SERVER_PORT,
             username: process.env.RABBITMQ_SERVER_USER,
             password: process.env.RABBITMQ_SERVER_PASSWORD
         }).then((conn) => {
