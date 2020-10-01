@@ -29,6 +29,9 @@ export default {
                 }
             }
         },
+        "description": {
+            "type": "text"
+        },
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "is_active": {
             "type": "boolean"
