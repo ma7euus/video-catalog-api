@@ -61,9 +61,9 @@ export class PingController {
       id: String(Date.now()),
       name: `My category ${Date.now()}`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      created_at: new Date(),
+      created_at: new Date().toISOString(),
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      updated_at: new Date(),
+      updated_at: new Date().toISOString(),
     });
     return this.categoryRepository.find();
   }

@@ -41,11 +41,20 @@ export class RabbitmqServer extends Context implements Server {
 
         this.channel.consume(queue.queue, (message) => {
             if (!message) return;
-            const data = JSON.parse(message?.content.toString());
-            const [model, event] = message.fields.routingKey.split('.').slice(1);
-            this.sync({model, event, data})
-                .then(() => this.channel.ack(message))
-                .catch(() => this.channel.reject(message, false));
+            try {
+                const data = JSON.parse(message?.content.toString());
+                const [model, event] = message.fields.routingKey.split('.').slice(1);
+                this.sync({model, event, data})
+                    .then(() => this.channel.ack(message))
+                    .catch((error) => {
+                        console.log(error);
+                        this.channel.reject(message, false);
+                    });
+            } catch (e) {
+                console.log(e);
+                this.channel.reject(message, false);
+                return;
+            }
         });
         //console.log(result);
     }
@@ -56,13 +65,20 @@ export class RabbitmqServer extends Context implements Server {
                 case 'created':
                     await this.categoryRepo.create({
                         ...data,
-                        created_at: new Date(),
-                        updated_at: new Date()
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
                     });
+                    break;
+                case 'updated':
+                    await this.categoryRepo.updateById(data.id, data);
+                    break;
+                case 'deleted':
+                    await this.categoryRepo.deleteById(data.id);
                     break;
             }
         }
     }
+
     async stop(): Promise<void> {
         await this.conn.close();
         this._listening = false;

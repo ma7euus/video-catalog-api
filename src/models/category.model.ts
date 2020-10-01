@@ -29,14 +29,14 @@ export class Category extends Entity {
         required: true
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
-    created_at: Date;
+    created_at: string;
 
     @property({
         type: 'date',
         required: true
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
-    updated_at: Date;
+    updated_at: string;
 
     [prop: string]: any;
 
