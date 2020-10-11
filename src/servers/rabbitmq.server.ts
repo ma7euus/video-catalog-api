@@ -1,39 +1,50 @@
-import {Context} from "@loopback/context";
-import {Server} from "@loopback/core";
-import {Channel, connect, Connection, Replies} from "amqplib";
+import {Context, inject} from "@loopback/context";
+import {Channel, Connection, Replies} from "amqplib";
 import AssertQueue = Replies.AssertQueue;
 import AssertExchange = Replies.AssertExchange;
 import {CategoryRepository} from "../repositories";
 import {repository} from "@loopback/repository";
 import {Category} from "../models";
+import {RabbitmqBindings} from "../keys";
+import {Server} from "@loopback/core";
+import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from "amqp-connection-manager";
+
+
+export interface RabbitmqConfig {
+    uri: string,
+    connOptions?: AmqpConnectionManagerOptions
+}
 
 export class RabbitmqServer extends Context implements Server {
     private _listening: boolean;
-    private conn: Connection;
-    private channel: Channel;
+    private _conn: AmqpConnectionManager;
+    private _channelManager: ChannelWrapper;
+    channel: Channel;
 
-    constructor(@repository(CategoryRepository) private categoryRepo: CategoryRepository) {
+    constructor(
+        @repository(CategoryRepository) private categoryRepo: CategoryRepository,
+        @inject(RabbitmqBindings.CONFIG) private config: RabbitmqConfig
+    ) {
         super();
     }
 
     async start(): Promise<void> {
         console.log('Starting Rabbitmq connection...');
-        await connect({
-            hostname: process.env.RABBITMQ_SERVER_HOST,
-            //port: process.env.RABBITMQ_SERVER_PORT,
-            username: process.env.RABBITMQ_SERVER_USER,
-            password: process.env.RABBITMQ_SERVER_PASSWORD
-        }).then((conn) => {
-            console.log('Connectec with Rabbitmq Server!');
-            this.conn = conn;
+        this._conn = connect([this.config.uri], this.config.connOptions);
+        this._channelManager = this.conn.createChannel();
+        this._channelManager.on('connect', () => {
+            console.log('Successfully connected a RabbitMQ Channel');
             this._listening = true;
-            this.boot();
-        }).catch((err) => {
-            console.log('Error to onnectec with Rabbitmq Server!', err);
+           //this.boot();
+        });
+        this._channelManager.on('error', (err, {name}) => {
+            console.log(`Failed to setup a RabbitMQ Channel - name: ${name} | error: ${err.message}`);
+           this._listening = false;
         });
     }
 
     async boot() {
+        // @ts-ignore
         this.channel = await this.conn.createChannel();
         const queue: AssertQueue = await this.channel.assertQueue('micro-catalog/sync-videos');
         const exchange: AssertExchange = await this.channel.assertExchange('amq.topic', 'topic');
@@ -43,7 +54,7 @@ export class RabbitmqServer extends Context implements Server {
         this.channel.consume(queue.queue, (message) => {
             if (!message) return;
             try {
-                const data = JSON.parse(message?.content.toString());
+                const data = JSON.parse(message?.content?.toString());
                 const [model, event] = message.fields.routingKey.split('.').slice(1);
                 this.sync({model, event, data})
                     .then(() => this.channel.ack(message))
@@ -87,5 +98,9 @@ export class RabbitmqServer extends Context implements Server {
 
     get listening(): boolean {
         return this._listening;
+    }
+
+    get conn(): AmqpConnectionManager {
+        return this._conn;
     }
 }
