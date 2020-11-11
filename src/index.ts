@@ -38,7 +38,11 @@ if (require.main === module) {
             },
         },
         rabbitmq: {
-            uri: process.env.RABBITMQ_SERVER_URI
+            uri: process.env.RABBITMQ_SERVER_URI,
+            /*exchanges: [
+                {name: 'test1', type: 'direct'},
+                {name: 'test2', type: 'direct'},
+            ]*/
         }
     };
     main(config).catch(err => {

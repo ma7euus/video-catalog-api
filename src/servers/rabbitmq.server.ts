@@ -1,5 +1,5 @@
 import {Context, inject} from "@loopback/context";
-import {Channel, Connection, Replies} from "amqplib";
+import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
 import AssertQueue = Replies.AssertQueue;
 import AssertExchange = Replies.AssertExchange;
 import {CategoryRepository} from "../repositories";
@@ -11,8 +11,9 @@ import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, con
 
 
 export interface RabbitmqConfig {
-    uri: string,
-    connOptions?: AmqpConnectionManagerOptions
+    uri: string;
+    connOptions?: AmqpConnectionManagerOptions;
+    exchanges?: { name: string, type: string, options?: Options.AssertExchange }[]
 }
 
 export class RabbitmqServer extends Context implements Server {
@@ -32,14 +33,26 @@ export class RabbitmqServer extends Context implements Server {
         console.log('Starting Rabbitmq connection...');
         this._conn = connect([this.config.uri], this.config.connOptions);
         this._channelManager = this.conn.createChannel();
-        this._channelManager.on('connect', () => {
+        this.channelManager.on('connect', () => {
             console.log('Successfully connected a RabbitMQ Channel');
             this._listening = true;
-           //this.boot();
+            //this.boot();
         });
-        this._channelManager.on('error', (err, {name}) => {
+        this.channelManager.on('error', (err, {name}) => {
             console.log(`Failed to setup a RabbitMQ Channel - name: ${name} | error: ${err.message}`);
-           this._listening = false;
+            this._listening = false;
+        });
+        await this.steUpExchanges();
+    }
+
+    private async steUpExchanges() {
+        return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+            if(!this.config.exchanges) {
+                return;
+            }
+            await Promise.all(this.config.exchanges.map((exchange) => (
+                channel.assertExchange(exchange.name, exchange.type, exchange.options)
+            )));
         });
     }
 
@@ -102,5 +115,9 @@ export class RabbitmqServer extends Context implements Server {
 
     get conn(): AmqpConnectionManager {
         return this._conn;
+    }
+
+    get channelManager(): ChannelWrapper {
+        return this._channelManager;
     }
 }
