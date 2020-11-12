@@ -1,4 +1,4 @@
-import {Context, inject} from "@loopback/context";
+import {Context, inject, Binding} from "@loopback/context";
 import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
 import AssertQueue = Replies.AssertQueue;
 import AssertExchange = Replies.AssertExchange;
@@ -6,9 +6,11 @@ import {CategoryRepository} from "../repositories";
 import {repository} from "@loopback/repository";
 import {Category} from "../models";
 import {RabbitmqBindings} from "../keys";
-import {Server} from "@loopback/core";
+import {Application, CoreBindings, Server} from "@loopback/core";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from "amqp-connection-manager";
-
+import {RABBITMQ_SUBSCRIBE_DECORATOR} from "../decorators";
+import {CategorySyncService} from "../services";
+import {MetadataInspector} from "@loopback/metadata";
 
 export interface RabbitmqConfig {
     uri: string;
@@ -23,10 +25,11 @@ export class RabbitmqServer extends Context implements Server {
     channel: Channel;
 
     constructor(
+        @inject(CoreBindings.APPLICATION_INSTANCE) public app: Application,
         @repository(CategoryRepository) private categoryRepo: CategoryRepository,
         @inject(RabbitmqBindings.CONFIG) private config: RabbitmqConfig
     ) {
-        super();
+        super(app);
     }
 
     async start(): Promise<void> {
@@ -43,17 +46,43 @@ export class RabbitmqServer extends Context implements Server {
             this._listening = false;
         });
         await this.steUpExchanges();
+        console.log(this.getSubscribers());
     }
 
     private async steUpExchanges() {
         return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
-            if(!this.config.exchanges) {
+            if (!this.config.exchanges) {
                 return;
             }
             await Promise.all(this.config.exchanges.map((exchange) => (
                 channel.assertExchange(exchange.name, exchange.type, exchange.options)
             )));
         });
+    }
+
+    private getSubscribers() {
+        const bindings: Readonly<Binding<any>>[] = this.find('services.*');
+        return bindings.map(
+            binding => {
+                const metadata = MetadataInspector.getAllMethodMetadata(
+                    RABBITMQ_SUBSCRIBE_DECORATOR, binding.valueConstructor?.prototype);
+                if (!metadata) {
+                    return [];
+                }
+                const methods = [];
+                for (const methodName in metadata) {
+                    if (!Object.prototype.hasOwnProperty.call(metadata, methodName)) return;
+                    const service = this.getSync(binding.key) as any;
+                    methods.push({
+                        method: service[methodName].bind(service),
+                        metadata: metadata[methodName]
+                    });
+                }
+                return methods;
+            }
+        )
+        //const service = this.getSync<CategorySyncService>('services.CategorySyncService');
+        //const metadata = MetadataInspector.getAllMethodMetadata(RABBITMQ_SUBSCRIBE_DECORATOR, service);
     }
 
     async boot() {
