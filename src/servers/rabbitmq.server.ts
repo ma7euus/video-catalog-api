@@ -1,15 +1,11 @@
 import {Context, inject, Binding} from "@loopback/context";
-import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
-import AssertQueue = Replies.AssertQueue;
-import AssertExchange = Replies.AssertExchange;
+import {Channel, ConfirmChannel, Options} from "amqplib";
 import {CategoryRepository} from "../repositories";
 import {repository} from "@loopback/repository";
-import {Category} from "../models";
 import {RabbitmqBindings} from "../keys";
 import {Application, CoreBindings, Server} from "@loopback/core";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from "amqp-connection-manager";
-import {RABBITMQ_SUBSCRIBE_DECORATOR} from "../decorators";
-import {CategorySyncService} from "../services";
+import {RABBITMQ_SUBSCRIBE_DECORATOR, RabbitmqSubscribeMetada} from "../decorators";
 import {MetadataInspector} from "@loopback/metadata";
 
 export interface RabbitmqConfig {
@@ -39,17 +35,17 @@ export class RabbitmqServer extends Context implements Server {
         this.channelManager.on('connect', () => {
             console.log('Successfully connected a RabbitMQ Channel');
             this._listening = true;
-            //this.boot();
         });
         this.channelManager.on('error', (err, {name}) => {
             console.log(`Failed to setup a RabbitMQ Channel - name: ${name} | error: ${err.message}`);
             this._listening = false;
         });
-        await this.steUpExchanges();
-        console.log(this.getSubscribers());
+        await this.setUpExchanges();
+        await this.bindSubscribers();
+
     }
 
-    private async steUpExchanges() {
+    private async setUpExchanges() {
         return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
             if (!this.config.exchanges) {
                 return;
@@ -60,7 +56,29 @@ export class RabbitmqServer extends Context implements Server {
         });
     }
 
-    private getSubscribers() {
+    private async bindSubscribers() {
+        this.getSubscribers().map(async (item) => {
+            await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+                const {exchange, queue, routingKey, queueOptions} = item.metadata;
+                const assertQueue = await channel.assertQueue(
+                    queue ?? '',
+                    queueOptions ?? undefined
+                );
+                const routingKeys = Array.isArray(routingKey) ? routingKey : [routingKey];
+
+                await Promise.all(
+                    routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
+                );
+                await this.consume({
+                    channel,
+                    queue: assertQueue.queue,
+                    method: item.method
+                });
+            });
+        });
+    }
+
+    private getSubscribers(): { method: Function, metadata: RabbitmqSubscribeMetada }[] {
         const bindings: Readonly<Binding<any>>[] = this.find('services.*');
         return bindings.map(
             binding => {
@@ -80,57 +98,36 @@ export class RabbitmqServer extends Context implements Server {
                 }
                 return methods;
             }
-        )
+        ).reduce((collection: any, item: any) => {
+            collection.push(...item);
+            return collection;
+        }, []);
         //const service = this.getSync<CategorySyncService>('services.CategorySyncService');
         //const metadata = MetadataInspector.getAllMethodMetadata(RABBITMQ_SUBSCRIBE_DECORATOR, service);
     }
 
-    async boot() {
-        // @ts-ignore
-        this.channel = await this.conn.createChannel();
-        const queue: AssertQueue = await this.channel.assertQueue('micro-catalog/sync-videos');
-        const exchange: AssertExchange = await this.channel.assertExchange('amq.topic', 'topic');
-
-        await this.channel.bindQueue(queue.queue, exchange.exchange, 'model.*.*');
-
-        this.channel.consume(queue.queue, (message) => {
-            if (!message) return;
+    private async consume({channel, queue, method}: { channel: ConfirmChannel, queue: string, method: Function }) {
+        await channel.consume(queue, async message => {
             try {
-                const data = JSON.parse(message?.content?.toString());
-                const [model, event] = message.fields.routingKey.split('.').slice(1);
-                this.sync({model, event, data})
-                    .then(() => this.channel.ack(message))
-                    .catch((error) => {
-                        console.log(error);
-                        this.channel.reject(message, false);
-                    });
+                if (!message) {
+                    throw new Error('Received null message');
+                }
+                const content = message.content;
+                if (content) {
+                    let data;
+                    try {
+                        data = JSON.parse(content.toString());
+                    } catch (e) {
+                        data = null;
+                    }
+                    console.log(data);
+                    await method({data, message, channel});
+                }
             } catch (e) {
-                console.log(e);
-                this.channel.reject(message, false);
-                return;
+                console.error(e);
+
             }
         });
-        //console.log(result);
-    }
-
-    async sync({model, event, data}: { model: string, event: string, data: Category }) {
-        if (model === 'category') {
-            switch (event) {
-                case 'created':
-                    await this.categoryRepo.create({
-                        ...data,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    });
-                    break;
-                case 'updated':
-                    await this.categoryRepo.updateById(data.id, data);
-                    break;
-                case 'deleted':
-                    await this.categoryRepo.deleteById(data.id);
-                    break;
-            }
-        }
     }
 
     async stop(): Promise<void> {
