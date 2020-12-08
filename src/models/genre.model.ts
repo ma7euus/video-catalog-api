@@ -2,20 +2,13 @@ import {model, property} from '@loopback/repository';
 import {BaseEntity} from "./base-entity.model";
 
 @model()
-export class Category extends BaseEntity {
+export class Genre extends BaseEntity {
 
     @property({
         type: 'string',
         required: true,
     })
     name: string;
-
-    @property({
-        type: 'string',
-        required: false,
-        default: '',
-    })
-    description: string;
 
     @property({
         type: 'boolean',
@@ -27,13 +20,13 @@ export class Category extends BaseEntity {
 
     [prop: string]: any;
 
-    constructor(data?: Partial<Category>) {
+    constructor(data?: Partial<Genre>) {
         super(data);
     }
 }
 
-export interface CategoryRelations {
+export interface GenreRelations {
     // describe navigational properties here
 }
 
-export type CategoryWithRelations = Category & CategoryRelations;
+export type GenreWithRelations = Genre & GenreRelations;

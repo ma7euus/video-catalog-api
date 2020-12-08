@@ -32,6 +32,9 @@ export default {
         "description": {
             "type": "text"
         },
+        "type": {
+            "type": "byte"
+        },
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "is_active": {
             "type": "boolean"
