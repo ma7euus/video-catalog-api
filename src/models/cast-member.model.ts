@@ -1,4 +1,4 @@
-import {model, property} from '@loopback/repository';
+import {Entity, model, property} from '@loopback/repository';
 import {BaseEntity} from "./base-entity.model";
 
 export enum CastMemberType {
@@ -7,7 +7,7 @@ export enum CastMemberType {
 }
 
 @model()
-export class CastMember extends BaseEntity {
+export class CastMember extends Entity implements BaseEntity {
 
     @property({
         type: 'string',
@@ -33,6 +33,28 @@ export class CastMember extends BaseEntity {
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
     type: boolean;
+
+    @property({
+        type: 'string',
+        id: true,
+        generated: false,
+        required: true,
+    })
+    id: string;
+
+    @property({
+        type: 'date',
+        required: true
+    })
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+    created_at: string;
+
+    @property({
+        type: 'date',
+        required: true
+    })
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+    updated_at: string;
 
     [prop: string]: any;
 

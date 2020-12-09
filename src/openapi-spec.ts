@@ -11,6 +11,7 @@ async function exportOpenApiSpec(): Promise<void> {
             host: process.env.HOST ?? 'localhost',
         },
     };
+
     //const outFile = process.argv[2] ?? '';
     const app = new VideoCatalogApiApplication(config);
     await app.boot();

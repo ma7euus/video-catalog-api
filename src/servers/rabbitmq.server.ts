@@ -1,5 +1,5 @@
 import {Context, inject, Binding} from "@loopback/context";
-import {Channel, ConfirmChannel, Options} from "amqplib";
+import {Channel, ConfirmChannel, Message, Options} from "amqplib";
 import {CategoryRepository} from "../repositories";
 import {repository} from "@loopback/repository";
 import {RabbitmqBindings} from "../keys";
@@ -8,10 +8,17 @@ import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, con
 import {RABBITMQ_SUBSCRIBE_DECORATOR, RabbitmqSubscribeMetada} from "../decorators";
 import {MetadataInspector} from "@loopback/metadata";
 
+export enum ResponseEnum {
+    ACK = 0,
+    REQUEUE = 1,
+    NACK = 2
+}
+
 export interface RabbitmqConfig {
     uri: string;
     connOptions?: AmqpConnectionManagerOptions;
-    exchanges?: { name: string, type: string, options?: Options.AssertExchange }[]
+    exchanges?: { name: string, type: string, options?: Options.AssertExchange }[];
+    defaultHandlerError?: ResponseEnum;
 }
 
 export class RabbitmqServer extends Context implements Server {
@@ -57,7 +64,8 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     private async bindSubscribers() {
-        this.getSubscribers().map(async (item) => {
+        this.getSubscribers()?.map(async (item) => {
+
             await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
                 const {exchange, queue, routingKey, queueOptions} = item.metadata;
                 const assertQueue = await channel.assertQueue(
@@ -78,7 +86,7 @@ export class RabbitmqServer extends Context implements Server {
         });
     }
 
-    private getSubscribers(): { method: Function, metadata: RabbitmqSubscribeMetada }[] {
+    private getSubscribers(): any[] | undefined {
         const bindings: Readonly<Binding<any>>[] = this.find('services.*');
         return bindings.map(
             binding => {
@@ -121,13 +129,31 @@ export class RabbitmqServer extends Context implements Server {
                         data = null;
                     }
                     console.log(data);
-                    await method({data, message, channel});
+                    const responseType = await method({data, message, channel});
+                    this.dispatchResponse(channel, message, responseType);
                 }
             } catch (e) {
                 console.error(e);
-
+                if(!message){
+                    return;
+                }
+                this.dispatchResponse(channel, message, this.config?.defaultHandlerError);
             }
         });
+    }
+
+    private dispatchResponse(channel: Channel, message: Message, responseType?: ResponseEnum) {
+        switch (responseType) {
+            case ResponseEnum.NACK:
+                channel.nack(message, false, false);
+                break;
+            case ResponseEnum.REQUEUE:
+                channel.nack(message, false, true);
+                break;
+            case ResponseEnum.ACK:
+            default:
+                channel.ack(message);
+        }
     }
 
     async stop(): Promise<void> {
