@@ -1,5 +1,6 @@
+import './bootstrap';
 import * as commands from './commands';
-import * as chalk from 'chalk';
+import {chalk} from "./require";
 
 const command = process.argv[2] || null;
 
