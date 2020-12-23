@@ -8,6 +8,7 @@ import {RabbitmqServer} from "./servers";
 import {RestComponent, RestServer} from "@loopback/rest";
 import {RestExplorerBindings} from "@loopback/rest-explorer";
 import {RestExplorerComponent} from "./components";
+import {CrudRestComponent} from '@loopback/rest-crud';
 
 export {ApplicationConfig};
 
@@ -39,5 +40,6 @@ export class VideoCatalogApiApplication extends BootMixin(
             },
         };
         this.servers([RabbitmqServer]);
+      this.component(CrudRestComponent);
     }
 }
