@@ -9,6 +9,8 @@ import {RestComponent, RestServer} from "@loopback/rest";
 import {RestExplorerBindings} from "@loopback/rest-explorer";
 import {RestExplorerComponent} from "./components";
 import {CrudRestComponent} from '@loopback/rest-crud';
+import {ValidatorService} from "./services";
+import {Category} from "./models";
 
 export {ApplicationConfig};
 
@@ -24,10 +26,10 @@ export class VideoCatalogApiApplication extends BootMixin(
         restServer.static('/', path.join(__dirname, '../public'));
 
         // Customize @loopback/rest-explorer configuration here
-         this.configure(RestExplorerBindings.COMPONENT).to({
-             path: '/explorer',
-         });
-         this.component(RestExplorerComponent);
+        this.configure(RestExplorerBindings.COMPONENT).to({
+            path: '/explorer',
+        });
+        this.component(RestExplorerComponent);
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here
@@ -40,6 +42,20 @@ export class VideoCatalogApiApplication extends BootMixin(
             },
         };
         this.servers([RabbitmqServer]);
-      this.component(CrudRestComponent);
+        this.component(CrudRestComponent);
+    }
+
+    async boot() {
+        await super.boot();
+
+        const validator = this.getSync<ValidatorService>('services.ValidatorService');
+        try {
+            await validator.validate({
+                data: {},
+                entityClass: Category
+            });
+        } catch (e) {
+            console.dir(e, {depth: 0});
+        }
     }
 }
