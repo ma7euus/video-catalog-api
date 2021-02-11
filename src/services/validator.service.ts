@@ -24,8 +24,8 @@ export class ValidatorService {
     async validate<T extends object>({data, entityClass}: ValidateOptions<T>) {
         const modelSchema = getModelSchemaRef(entityClass);
         if (!modelSchema) {
-            const error = new Error('The parameter entityCkass is not a entity');
-            error.name = 'NotEntityCkass';
+            const error = new Error('The parameter entityClass is not a entity');
+            error.name = 'NotEntityClass';
             throw error;
         }
         const schemaRef = {$ref: modelSchema.$ref};

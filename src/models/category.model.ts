@@ -4,9 +4,25 @@ import {BaseEntity} from "./base-entity.model";
 @model()
 export class Category extends Entity implements BaseEntity {
 
+
+    @property({
+        type: 'string',
+        id: true,
+        generated: false,
+        required: true,
+        jsonSchema: {
+            exists: ['Category', 'id']
+        }
+    })
+    id: string;
+
     @property({
         type: 'string',
         required: true,
+        jsonSchema: {
+            minLength: 1,
+            maxLength: 255
+        }
     })
     name: string;
 
@@ -24,14 +40,6 @@ export class Category extends Entity implements BaseEntity {
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
     is_active: boolean;
-
-    @property({
-        type: 'string',
-        id: true,
-        generated: false,
-        required: true,
-    })
-    id: string;
 
     @property({
         type: 'date',
