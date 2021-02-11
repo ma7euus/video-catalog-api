@@ -42,7 +42,8 @@ export class ValidatorService {
             {}
         );
 
-        validateRequestBody(
+        console.dir(globalSchemas, {depth: 8});
+        await validateRequestBody(
             {value: data, schema: schemaRef},
             {required: true, content: {}},
             globalSchemas,
