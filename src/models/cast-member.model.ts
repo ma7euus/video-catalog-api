@@ -30,6 +30,9 @@ export class CastMember extends Entity implements BaseEntity {
     @property({
         type: 'number',
         required: true,
+        jsonSchema: {
+            enum: [CastMemberType.ACTOR, CastMemberType.DIRECTOR]
+        }
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
     type: boolean;

@@ -29,7 +29,10 @@ export class Category extends Entity implements BaseEntity {
     @property({
         type: 'string',
         required: false,
-        default: '',
+        default: null,
+        jsonSchema: {
+            nullable: true
+        }
     })
     description: string;
 
