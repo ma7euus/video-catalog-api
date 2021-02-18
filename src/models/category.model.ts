@@ -1,9 +1,14 @@
 import {Entity, model, property} from '@loopback/repository';
 import {BaseEntity} from "./base-entity.model";
 
+export interface RelCategoryFields {
+    id: string,
+    name: string,
+    is_active: boolean
+}
+
 @model()
 export class Category extends Entity implements BaseEntity {
-
 
     @property({
         type: 'string',
