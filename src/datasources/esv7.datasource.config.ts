@@ -46,6 +46,23 @@ export default {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "updated_at": {
             "type": "date"
+        },
+        "categories": {
+            "type": "nested",
+            "properties": {
+                "id": {"type": "keyword"},
+                "name": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "is_active": {"type": "boolean"},
+            }
         }
     }
 }
