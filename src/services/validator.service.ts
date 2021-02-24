@@ -7,7 +7,8 @@ import {AjvFactory, RestBindings, validateRequestBody} from "@loopback/rest";
 
 interface ValidateOptions<T> {
     data: object;
-    entityClass: Function & { prototype: T }
+    entityClass: Function & { prototype: T };
+    options?: any
 }
 
 @bind({scope: BindingScope.SINGLETON})
