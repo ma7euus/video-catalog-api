@@ -5,7 +5,7 @@ import {CategoryRepository} from "../repositories";
 import {Message} from "amqplib";
 import {BaseModelSyncService} from "./base-model-sync.service";
 import {ResponseEnum} from "../servers";
-import {ValidatorService} from "../../dist/services";
+import {ValidatorService} from "./validator.service";
 
 @injectable({scope: BindingScope.SINGLETON})
 export class CategorySyncService extends BaseModelSyncService {

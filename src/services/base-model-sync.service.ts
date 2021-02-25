@@ -2,7 +2,7 @@ import {DefaultCrudRepository, EntityNotFoundError} from "@loopback/repository";
 import {Message} from "amqplib";
 import {pick} from "lodash";
 import {BaseEntity} from "../models/base-entity.model";
-import {ValidatorService} from "../../dist/services";
+import {ValidatorService} from "./validator.service";
 
 export interface SyncOptions {
     repo: DefaultCrudRepository<any, any, any>;
