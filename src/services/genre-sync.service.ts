@@ -39,11 +39,10 @@ export class GenreSyncService extends BaseModelSyncService {
     async handlerCategories({data, message}: { data: any, message: Message }) {
         await this.syncRelation({
             id: data.id,
-            action: '',
+            repo: this.repo,
             relationName: 'categories',
             relationIds: data.relation_ids as any,
-            repo: this.repo,
-            repoRelation: this.categoryRepo,
+            relationRepo: this.categoryRepo,
             message: message,
         });
         return ResponseEnum.ACK;

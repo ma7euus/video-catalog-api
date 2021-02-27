@@ -7,10 +7,8 @@ import {MySequence} from './sequence';
 import {RabbitmqServer} from "./servers";
 import {RestComponent, RestServer} from "@loopback/rest";
 import {RestExplorerBindings} from "@loopback/rest-explorer";
-import {RestExplorerComponent, ValidatorsComponent} from "./components";
+import {EntityComponent, RestExplorerComponent, ValidatorsComponent} from "./components";
 import {CrudRestComponent} from '@loopback/rest-crud';
-import {ValidatorService} from "./services";
-import {Category} from "./models";
 
 export {ApplicationConfig};
 
@@ -31,6 +29,7 @@ export class VideoCatalogApiApplication extends BootMixin(
         });
         this.component(RestExplorerComponent);
         this.component(ValidatorsComponent);
+        this.component(EntityComponent);
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here

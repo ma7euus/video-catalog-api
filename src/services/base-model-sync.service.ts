@@ -12,11 +12,10 @@ export interface SyncOptions {
 
 export interface SyncRelationsOptions {
     id: string,
-    action: string
+    repo: DefaultCrudRepository<any, any, any>;
     relationName: string;
     relationIds: string[],
-    repo: DefaultCrudRepository<any, any, any>;
-    repoRelation: DefaultCrudRepository<any, any, any>;
+    relationRepo: DefaultCrudRepository<any, any, any>;
     message: Message;
 }
 
@@ -77,11 +76,10 @@ export abstract class BaseModelSyncService {
     async syncRelation(
         {
             id,
-            action,
+            repo,
             relationName,
             relationIds,
-            repo,
-            repoRelation,
+            relationRepo,
             message
         }: SyncRelationsOptions
     ) {
@@ -94,24 +92,25 @@ export abstract class BaseModelSyncService {
 
         const fieldsRelations = this.extractFieldsRelation({repo, relationName})
 
-        const collections = await repoRelation.find({
+        const collections = await relationRepo.find({
             where: {
                 or: relationIds.map(idRelation => ({id: idRelation}))
             }
         }, fieldsRelations)
 
         if (!collections.length) {
-            const error = new EntityNotFoundError(repoRelation.entityClass, relationIds);
+            const error = new EntityNotFoundError(relationRepo.entityClass, relationIds);
             error.name = 'ENTITY_NOT_FOUND';
             throw error;
         }
 
+        const action = this.getAction(message);
         switch (action) {
             case 'attached':
-                await (repo as any).relationAttach(id, relationName, collections)
+                await (repo as any).attachRelation(id, relationName, collections)
                 break;
-            case 'detach':
-                await (repo as any).relationDetach(id, relationName, collections)
+            case 'detached':
+                await (repo as any).detachRelation(id, relationName, collections)
                 break;
             default:
                 console.log(action)
