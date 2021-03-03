@@ -48,6 +48,17 @@ export class RabbitmqServer extends Context implements Server {
             this._listening = false;
         });
         await this.setUpExchanges();
+        await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+            const assertExchange = await channel.assertExchange('dlx.amq.topic', 'topic');
+            const assertQueue = await channel.assertQueue(
+                'dlx.sync-videos',
+                {
+                    deadLetterExchange: 'amq.topic',
+                    messageTtl: 20000
+                }
+            );
+            await channel.bindQueue(assertQueue.queue, assertExchange.exchange, 'model.category.*');
+        });
         await this.bindSubscribers();
 
     }
@@ -144,11 +155,11 @@ export class RabbitmqServer extends Context implements Server {
 
     private dispatchResponse(channel: Channel, message: Message, responseType?: ResponseEnum) {
         switch (responseType) {
-            case ResponseEnum.NACK:
-                channel.nack(message, false, false);
-                break;
             case ResponseEnum.REQUEUE:
                 channel.nack(message, false, true);
+                break;
+            case ResponseEnum.NACK:
+                channel.nack(message, false, false);
                 break;
             case ResponseEnum.ACK:
             default:
