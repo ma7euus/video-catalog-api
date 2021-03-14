@@ -1,11 +1,9 @@
 import {Context, inject, Binding} from "@loopback/context";
 import {Channel, ConfirmChannel, Message, Options} from "amqplib";
-import {CategoryRepository} from "../repositories";
-import {repository} from "@loopback/repository";
 import {RabbitmqBindings} from "../keys";
 import {Application, CoreBindings, Server} from "@loopback/core";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from "amqp-connection-manager";
-import {RABBITMQ_SUBSCRIBE_DECORATOR, RabbitmqSubscribeMetada} from "../decorators";
+import {RABBITMQ_SUBSCRIBE_DECORATOR} from "../decorators";
 import {MetadataInspector} from "@loopback/metadata";
 
 export enum ResponseEnum {
@@ -36,7 +34,6 @@ export class RabbitmqServer extends Context implements Server {
 
     constructor(
         @inject(CoreBindings.APPLICATION_INSTANCE) public app: Application,
-        @repository(CategoryRepository) private categoryRepo: CategoryRepository,
         @inject(RabbitmqBindings.CONFIG) private config: RabbitmqConfig
     ) {
         super(app);
@@ -78,7 +75,7 @@ export class RabbitmqServer extends Context implements Server {
             }
             await Promise.all(this.config.queues.map(async (queue) => {
                     await channel.assertQueue(queue.name, queue.options);
-                    if(!queue.exchange) return;
+                    if (!queue.exchange) return;
                     await channel.bindQueue(queue.name, queue.exchange.name, queue.exchange.routingKey);
                 }
             ));
@@ -159,7 +156,7 @@ export class RabbitmqServer extends Context implements Server {
                     routingKey: message?.fields.routingKey,
                     content: message?.content.toString()
                 });
-                if(!message){
+                if (!message) {
                     return;
                 }
                 this.dispatchResponse(channel, message, this.config?.defaultHandlerError);
@@ -184,9 +181,9 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     canDeadLetter({channel, message}: { channel: Channel, message: Message }) {
-        if(message.properties.headers && 'x-death' in message.properties.headers) {
+        if (message.properties.headers && 'x-death' in message.properties.headers) {
             const count = message.properties.headers['x-death']![0].count;
-            if(count >= this.maxAttempts) {
+            if (count >= this.maxAttempts) {
                 channel.ack(message);
                 const queue = message.properties.headers['x-death']![0].queue;
                 console.log(`Ack in ${queue} with error. Max attempts exceeded ${this.maxAttempts}`);

@@ -15,9 +15,9 @@ export class Category extends Entity implements BaseEntity {
         id: true,
         generated: false,
         required: true,
-        jsonSchema: {
-            exists: ['Category', 'id']
-        }
+        //jsonSchema: {
+           // exists: ['Category', 'id']
+       // }
     })
     id: string;
 

@@ -7,6 +7,14 @@ export class Genre extends Entity implements BaseEntity {
 
     @property({
         type: 'string',
+        id: true,
+        generated: false,
+        required: true,
+    })
+    id: string;
+
+    @property({
+        type: 'string',
         required: true,
         jsonSchema: {
             minLength: 1,
@@ -22,14 +30,6 @@ export class Genre extends Entity implements BaseEntity {
     })
         // eslint-disable-next-line @typescript-eslint/naming-convention
     is_active: boolean;
-
-    @property({
-        type: 'string',
-        id: true,
-        generated: false,
-        required: true,
-    })
-    id: string;
 
     @property({
         type: 'date',
