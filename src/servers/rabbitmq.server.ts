@@ -84,7 +84,6 @@ export class RabbitmqServer extends Context implements Server {
 
     private async bindSubscribers() {
         this.getSubscribers()?.map(async (item) => {
-
             await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
                 const {exchange, queue, routingKey, queueOptions} = item.metadata;
                 const assertQueue = await channel.assertQueue(
@@ -96,6 +95,7 @@ export class RabbitmqServer extends Context implements Server {
                 await Promise.all(
                     routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
                 );
+
                 await this.consume({
                     channel,
                     queue: assertQueue.queue,
@@ -134,6 +134,7 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     private async consume({channel, queue, method}: { channel: ConfirmChannel, queue: string, method: Function }) {
+
         await channel.consume(queue, async message => {
             try {
                 if (!message) {
@@ -147,6 +148,7 @@ export class RabbitmqServer extends Context implements Server {
                     } catch (e) {
                         data = null;
                     }
+                    console.log(message);
                     const responseType = await method({data, message, channel});
                     this.dispatchResponse(channel, message, responseType);
                 }
