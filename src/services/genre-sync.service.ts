@@ -20,7 +20,10 @@ export class GenreSyncService extends BaseModelSyncService {
     @rabbitmqSubscribe({
         exchange: 'amq.topic',
         queue: 'micro-catalog/sync-videos/genre',
-        routingKey: 'model.genre.*'
+        routingKey: 'model.genre.*',
+        queueOptions: {
+            deadLetterExchange: 'dlx.amp.topic'
+        }
     })
     async handler({data, message}: { data: any, message: Message }) {
         await this.sync({
@@ -34,7 +37,10 @@ export class GenreSyncService extends BaseModelSyncService {
     @rabbitmqSubscribe({
         exchange: 'amq.topic',
         queue: 'micro-catalog/sync-videos/genre_categories',
-        routingKey: 'model.genre_categories.*'
+        routingKey: 'model.genre_categories.*',
+        queueOptions: {
+            deadLetterExchange: 'dlx.amp.topic'
+        }
     })
     async handlerCategories({data, message}: { data: any, message: Message }) {
         console.log(data);

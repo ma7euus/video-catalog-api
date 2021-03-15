@@ -15,7 +15,7 @@ export const config = {
     },
     rabbitmq: {
         uri: process.env.RABBITMQ_SERVER_URI,
-        defaultHandlerError: parseInt(process.env.RABBITMQ_SERVER_HANDLER_ERROR || '0'),
+        defaultHandlerError: parseInt(<string>process.env.RABBITMQ_SERVER_HANDLER_ERROR),
         exchanges: [
             {
                 name: 'dlx.amq.topic', type: 'topic'

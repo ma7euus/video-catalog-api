@@ -19,7 +19,10 @@ export class CastMemberSyncService extends BaseModelSyncService {
     @rabbitmqSubscribe({
         exchange: 'amq.topic',
         queue: 'micro-catalog/sync-videos/cast_member',
-        routingKey: 'model.cast_member.*'
+        routingKey: 'model.cast_member.*',
+        queueOptions: {
+            deadLetterExchange: 'dlx.amp.topic'
+        }
     })
     async handler({data, message}: { data: any, message: Message }) {
         await this.sync({

@@ -147,7 +147,6 @@ export class RabbitmqServer extends Context implements Server {
                     } catch (e) {
                         data = null;
                     }
-                    console.log(data);
                     const responseType = await method({data, message, channel});
                     this.dispatchResponse(channel, message, responseType);
                 }
