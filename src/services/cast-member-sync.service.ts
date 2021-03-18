@@ -21,7 +21,7 @@ export class CastMemberSyncService extends BaseModelSyncService {
         queue: 'micro-catalog/sync-videos/cast_member',
         routingKey: 'model.cast_member.*',
         queueOptions: {
-            deadLetterExchange: 'dlx.amp.topic'
+            deadLetterExchange: 'dlx.amq.topic'
         }
     })
     async handler({data, message}: { data: any, message: Message }) {

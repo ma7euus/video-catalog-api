@@ -27,7 +27,7 @@ export interface RabbitmqConfig {
 export class RabbitmqServer extends Context implements Server {
     private _listening: boolean;
     private _conn: AmqpConnectionManager;
-    private _channelManager: ChannelWrapper;
+    private _channelWrapper: ChannelWrapper;
     private maxAttempts = 3;
 
     channel: Channel;
@@ -42,15 +42,15 @@ export class RabbitmqServer extends Context implements Server {
     async start(): Promise<void> {
         console.log('Starting Rabbitmq connection...');
         this._conn = connect([this.config.uri], this.config.connOptions);
-        this._channelManager = this.conn.createChannel();
-        this.channelManager.on('connect', () => {
+        this._channelWrapper = this._conn.createChannel();
+        this._channelWrapper.on('connect', () => {
             console.log('Successfully connected a RabbitMQ Channel');
             this._listening = true;
-        });
-        this.channelManager.on('error', (err, {name}) => {
+        }).on('error', (err, {name}) => {
             console.log(`Failed to setup a RabbitMQ Channel - name: ${name} | error: ${err.message}`);
             this._listening = false;
         });
+
         await this.setUpExchanges();
         await this.setUpQueues();
         await this.bindSubscribers();
@@ -58,7 +58,7 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     private async setUpExchanges() {
-        return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+        return this._channelWrapper.addSetup(async (channel: ConfirmChannel) => {
             if (!this.config.exchanges) {
                 return;
             }
@@ -69,7 +69,7 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     private async setUpQueues() {
-        return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+        return this._channelWrapper.addSetup(async (channel: ConfirmChannel) => {
             if (!this.config.queues) {
                 return;
             }
@@ -84,17 +84,12 @@ export class RabbitmqServer extends Context implements Server {
 
     private async bindSubscribers() {
         this.getSubscribers()?.map(async (item) => {
-            await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+            await this._channelWrapper.addSetup(async (channel: ConfirmChannel) => {
                 const {exchange, queue, routingKey, queueOptions} = item.metadata;
-                const assertQueue = await channel.assertQueue(
-                    queue ?? '',
-                    queueOptions ?? undefined
-                );
+                const assertQueue = await channel.assertQueue(queue ?? '', queueOptions ?? undefined);
                 const routingKeys = Array.isArray(routingKey) ? routingKey : [routingKey];
 
-                await Promise.all(
-                    routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
-                );
+                await Promise.all(routingKeys.map((routing: string) => channel.bindQueue(assertQueue.queue, exchange, routing)));
 
                 await this.consume({
                     channel,
@@ -129,12 +124,9 @@ export class RabbitmqServer extends Context implements Server {
             collection.push(...item);
             return collection;
         }, []);
-        //const service = this.getSync<CategorySyncService>('services.CategorySyncService');
-        //const metadata = MetadataInspector.getAllMethodMetadata(RABBITMQ_SUBSCRIBE_DECORATOR, service);
     }
 
     private async consume({channel, queue, method}: { channel: ConfirmChannel, queue: string, method: Function }) {
-
         await channel.consume(queue, async message => {
             try {
                 if (!message) {
@@ -148,8 +140,8 @@ export class RabbitmqServer extends Context implements Server {
                     } catch (e) {
                         data = null;
                     }
-                    console.log(message);
-                    const responseType = await method({data, message, channel});
+                    const [action] = message.fields.routingKey.split('.').slice(2);
+                    const responseType = await method({data, message, channel, action});
                     this.dispatchResponse(channel, message, responseType);
                 }
             } catch (e) {
@@ -195,7 +187,7 @@ export class RabbitmqServer extends Context implements Server {
     }
 
     async stop(): Promise<void> {
-        await this.conn.close();
+        await this._conn.close();
         this._listening = false;
     }
 
@@ -207,7 +199,7 @@ export class RabbitmqServer extends Context implements Server {
         return this._conn;
     }
 
-    get channelManager(): ChannelWrapper {
-        return this._channelManager;
+    get channelWrapper(): ChannelWrapper {
+        return this._channelWrapper;
     }
 }
