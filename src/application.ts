@@ -12,6 +12,7 @@ import {CrudRestComponent} from '@loopback/rest-crud';
 import {AuthenticationComponent} from "@loopback/authentication";
 import {JWTAuthenticationComponent, TokenServiceBindings} from "@loopback/authentication-jwt";
 import {JWTService} from "./services/auth/jwt.service";
+import {AuthorizationComponent, AuthorizationDecision} from "@loopback/authorization";
 
 export {ApplicationConfig};
 
@@ -36,6 +37,12 @@ export class VideoCatalogApiApplication extends BootMixin(
         this.component(AuthenticationComponent);
         this.component(JWTAuthenticationComponent);
         this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+        const bindings = this.component((AuthorizationComponent));
+        this.configure(bindings.key).to({
+            precedence: AuthorizationDecision.DENY,
+            defaultDecision: AuthorizationDecision.DENY
+        });
+
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here
         this.bootOptions = {

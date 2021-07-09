@@ -21,6 +21,7 @@ export class JWTService implements TokenService {
     ) {
     }
 
+    // @ts-ignore
     async verifyToken(token: string): Promise<UserProfile> {
         if (!token) {
             throw new HttpErrors.Unauthorized(
@@ -43,7 +44,7 @@ export class JWTService implements TokenService {
                 {
                     [securityId]: decodedToken.id,
                     name: decodedToken.name,
-                    id: decodedToken.id,
+                    id: decodedToken.sub,
                 },
             );
         } catch (error) {
@@ -54,6 +55,7 @@ export class JWTService implements TokenService {
         return userProfile;
     }
 
+    // @ts-ignore
     async generateToken(userProfile: UserProfile): Promise<string> {
         if (!userProfile) {
             throw new HttpErrors.Unauthorized(

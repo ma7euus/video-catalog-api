@@ -48,6 +48,7 @@
   "dependencies": {
     "@loopback/authentication": "^3.1.0",
     "@loopback/authentication-jwt": "^0.6.0",
+    "@loopback/authorization": "^0.6.0",
     "@loopback/boot": "^2.0.3",
     "@loopback/context": "^3.3.0",
     "@loopback/core": "^2.2.1",
@@ -61,6 +62,7 @@
     "amqp-connection-manager": "^3.2.1",
     "amqplib": "^0.6.0",
     "chalk": "github:chalk/chalk",
+    "class-transformer": "^0.4.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.20",
     "loopback-connector-esv6": "https://github.com/codeedu/loopback-connector-elastic-search/tarball/master",
