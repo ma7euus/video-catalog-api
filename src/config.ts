@@ -34,5 +34,8 @@ export const config = {
                 },
             }
         ]
+    },
+    jwt: {
+        secret: process.env.JWT_PUBLIC_KEY
     }
 }

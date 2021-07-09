@@ -9,6 +9,9 @@ import {RestComponent, RestServer} from "@loopback/rest";
 import {RestExplorerBindings} from "@loopback/rest-explorer";
 import {EntityComponent, RestExplorerComponent, ValidatorsComponent} from "./components";
 import {CrudRestComponent} from '@loopback/rest-crud';
+import {AuthenticationComponent} from "@loopback/authentication";
+import {JWTAuthenticationComponent, TokenServiceBindings} from "@loopback/authentication-jwt";
+import {JWTService} from "./services/auth/jwt.service";
 
 export {ApplicationConfig};
 
@@ -30,7 +33,9 @@ export class VideoCatalogApiApplication extends BootMixin(
         this.component(RestExplorerComponent);
         this.component(ValidatorsComponent);
         this.component(EntityComponent);
-
+        this.component(AuthenticationComponent);
+        this.component(JWTAuthenticationComponent);
+        this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here
         this.bootOptions = {
