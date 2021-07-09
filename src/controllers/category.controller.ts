@@ -14,8 +14,10 @@ import {
 import {Category} from '../models';
 import {CategoryRepository} from '../repositories';
 import {authenticate} from "@loopback/authentication";
+import {authorize} from "@loopback/authorization";
 
 @authenticate('jwt')
+@authorize({allowedRoles: ['subscriber']})
 export class CategoryController {
     constructor(
         @repository(CategoryRepository)

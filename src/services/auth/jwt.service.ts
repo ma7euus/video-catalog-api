@@ -45,6 +45,7 @@ export class JWTService implements TokenService {
                     [securityId]: decodedToken.id,
                     name: decodedToken.name,
                     id: decodedToken.sub,
+                    roles: decodedToken.realm_access?.roles || []
                 },
             );
         } catch (error) {

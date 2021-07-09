@@ -12,7 +12,8 @@ import {CrudRestComponent} from '@loopback/rest-crud';
 import {AuthenticationComponent} from "@loopback/authentication";
 import {JWTAuthenticationComponent, TokenServiceBindings} from "@loopback/authentication-jwt";
 import {JWTService} from "./services/auth/jwt.service";
-import {AuthorizationComponent, AuthorizationDecision} from "@loopback/authorization";
+import {AuthorizationComponent, AuthorizationDecision, AuthorizationTags} from "@loopback/authorization";
+import {SubscriberAuthorizationProvider} from "./providers/subscriber-authorization.provider";
 
 export {ApplicationConfig};
 
@@ -42,6 +43,10 @@ export class VideoCatalogApiApplication extends BootMixin(
             precedence: AuthorizationDecision.DENY,
             defaultDecision: AuthorizationDecision.DENY
         });
+
+        this.bind('authorizationProviders.subscriber-provider')
+            .toProvider(SubscriberAuthorizationProvider)
+            .tag(AuthorizationTags.AUTHORIZER);
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here
