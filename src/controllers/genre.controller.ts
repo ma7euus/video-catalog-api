@@ -13,6 +13,7 @@ import {
 } from '@loopback/rest';
 import {Genre} from '../models';
 import {GenreRepository} from '../repositories';
+import {PaginatorSerializer} from "../utils";
 
 export class GenreController {
     constructor(
@@ -52,8 +53,8 @@ export class GenreController {
     })
     async find(
         @param.filter(Genre) filter?: Filter<Genre>,
-    ): Promise<Genre[]> {
-        return this.genreRepository.find(filter);
+    ): Promise<PaginatorSerializer<Genre>> {
+        return this.genreRepository.paginate(filter);
     }
 
     @get('/genres/{id}', {

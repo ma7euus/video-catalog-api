@@ -13,6 +13,7 @@ import {
 } from '@loopback/rest';
 import {CastMember} from '../models';
 import {CastMemberRepository} from '../repositories';
+import {PaginatorSerializer} from "../utils";
 
 export class CastMemberController {
     constructor(
@@ -52,8 +53,8 @@ export class CastMemberController {
     })
     async find(
         @param.filter(CastMember) filter?: Filter<CastMember>,
-    ): Promise<CastMember[]> {
-        return this.castMemberRepository.find(filter);
+    ): Promise<PaginatorSerializer<CastMember>> {
+        return this.castMemberRepository.paginate(filter);
     }
 
     @get('/cast-members/{id}', {

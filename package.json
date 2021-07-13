@@ -6,10 +6,9 @@
     "loopback-application",
     "loopback"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
   "engines": {
-    "node": ">=10.16"
+    "node": ">=8.9"
   },
   "scripts": {
     "build": "lb-tsc",
@@ -41,39 +40,41 @@
   "license": "",
   "files": [
     "README.md",
+    "index.js",
+    "index.d.ts",
     "dist",
     "src",
     "!*/__tests__"
   ],
   "dependencies": {
-    "@loopback/authentication": "^3.1.0",
-    "@loopback/authentication-jwt": "^0.6.0",
+    "@loopback/authentication": "^4.0.0",
+    "@loopback/authentication-jwt": "^0.9.0",
     "@loopback/authorization": "^0.6.0",
     "@loopback/boot": "^2.0.3",
     "@loopback/context": "^3.3.0",
     "@loopback/core": "^2.2.1",
+    "@loopback/metadata": "^3.3.1",
     "@loopback/openapi-v3": "^3.1.2",
     "@loopback/repository": "^2.1.0",
-    "@loopback/rest": "^6.2.0",
-    "@loopback/rest-crud": "^0.8.19",
+    "@loopback/rest": "^3.2.0",
+    "@loopback/rest-crud": "^0.10.1",
     "@loopback/rest-explorer": "^2.0.3",
     "@loopback/security": "^0.2.18",
     "@loopback/service-proxy": "^2.0.3",
-    "amqp-connection-manager": "^3.2.1",
-    "amqplib": "^0.6.0",
-    "chalk": "github:chalk/chalk",
+    "amqp-connection-manager": "^3.2.0",
+    "amqplib": "^0.5.6",
     "class-transformer": "^0.4.0",
     "dotenv": "^8.2.0",
-    "lodash": "^4.17.20",
-    "loopback-connector-esv6": "https://github.com/codeedu/loopback-connector-elastic-search/tarball/master",
-    "tslib": "^2.0.3"
+    "lodash": "^4.17.15",
+    "loopback-connector-esv6": "https://github.com/codeedu/loopback-connector-elastic-search/tarball/master"
   },
   "devDependencies": {
     "@loopback/build": "^5.0.1",
     "@loopback/eslint-config": "^6.0.3",
     "@loopback/testlab": "^3.0.0",
-    "@types/amqplib": "^0.5.13",
     "@types/amqp-connection-manager": "^2.0.10",
+    "@types/amqplib": "^0.5.13",
+    "@types/json-schema": "^7.0.6",
     "@types/lodash": "^4.14.152",
     "@types/node": "^10.17.19",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
@@ -82,6 +83,7 @@
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-eslint-plugin": "^2.2.1",
     "eslint-plugin-mocha": "^6.3.0",
+    "json-schema": "^0.2.5",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.8.2",
     "tsconfig-paths": "^3.9.0",

@@ -1,10 +1,9 @@
 import './bootstrap';
 import {
-    ApplicationConfig,
     VideoCatalogApiApplication
 } from './application';
 import {RestServer} from "@loopback/rest";
-
+import {ApplicationConfig} from "@loopback/core";
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
@@ -18,16 +17,4 @@ export async function main(options: ApplicationConfig = {}) {
     console.log(`Try ${url}/ping`);
 
     return app;
-}
-
-import {config} from "./config";
-
-if (require.main === module) {
-    // Run the application
-    main(config).catch(err => {
-
-        console.error('Cannot start the application.', err);
-        process.exit(1);
-
-    });
 }

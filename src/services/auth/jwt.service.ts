@@ -1,8 +1,3 @@
-// Copyright IBM Corp. 2020. All Rights Reserved.
-// Node module: @loopback/authentication-jwt
-// This file is licensed under the MIT License.
-// License text available at https://opensource.org/licenses/MIT
-
 import {TokenService} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {HttpErrors} from '@loopback/rest';
@@ -21,7 +16,6 @@ export class JWTService implements TokenService {
     ) {
     }
 
-    // @ts-ignore
     async verifyToken(token: string): Promise<UserProfile> {
         if (!token) {
             throw new HttpErrors.Unauthorized(
@@ -56,7 +50,6 @@ export class JWTService implements TokenService {
         return userProfile;
     }
 
-    // @ts-ignore
     async generateToken(userProfile: UserProfile): Promise<string> {
         if (!userProfile) {
             throw new HttpErrors.Unauthorized(

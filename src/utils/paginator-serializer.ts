@@ -1,8 +1,10 @@
 import {RequestContext} from "@loopback/rest";
-import {stringify} from "querystring";
+import {stringify} from "qs";
+import {Exclude, Expose} from "class-transformer";
 
 export class PaginatorSerializer<T = any> {
 
+    @Exclude()
     baseUrl: string;
 
     constructor(
@@ -13,19 +15,21 @@ export class PaginatorSerializer<T = any> {
     ) {
     }
 
+    @Expose()
     get previous_url(): string | null {
         let previous: string | null = null;
         if (this.offset > 0 && this.count) {
             previous = `${this.baseUrl}?${stringify({
                 filter: {
                     limit: this.limit,
-                    ...(this.offset - this.limit >= 0 && {offset: this.offset}),
+                    ...(this.offset - this.limit > 0 && {offset: this.offset}),
                 }
             })}`;
         }
         return previous;
     }
 
+    @Expose()
     get next_url(): string | null {
         let next: string | null = null;
         if (this.count > this.offset + this.limit) {

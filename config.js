@@ -1,6 +1,6 @@
-export const config = {
+module.exports = {
     rest: {
-        port: +(process.env.PORT ?? 3000),
+        port: +(process.env.PORT || 3000),
         host: process.env.HOST,
         // The `gracePeriodForClose` provides a graceful close for http/https
         // servers with keep-alive clients. The default value is `Infinity`
@@ -15,10 +15,11 @@ export const config = {
     },
     rabbitmq: {
         uri: process.env.RABBITMQ_SERVER_URI,
-        defaultHandlerError: parseInt(<string>process.env.RABBITMQ_SERVER_HANDLER_ERROR),
+        defaultHandlerError: parseInt(process.env.RABBITMQ_SERVER_HANDLER_ERROR),
         exchanges: [
             {
-                name: 'dlx.amq.topic', type: 'topic'
+                name: 'dlx.amq.topic',
+                type: 'topic'
             }
         ],
         queues: [
@@ -37,5 +38,5 @@ export const config = {
     },
     jwt: {
         secret: process.env.JWT_PUBLIC_KEY
-    }
-}
+    },
+};

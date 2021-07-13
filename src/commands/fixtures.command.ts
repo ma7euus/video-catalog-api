@@ -1,11 +1,11 @@
 import {chalk} from "../require";
 import {VideoCatalogApiApplication} from "../application";
-import {config} from "../config";
 import {Esv7DataSource} from "../datasources";
 import {Client} from 'es7';
 import fixtures from '../fixtures';
 import {DefaultCrudRepository} from "@loopback/repository";
 import {ValidatorService} from "../services";
+import * as config from "../../config";
 
 export class FixturesCommand {
     static command = 'fixtures';

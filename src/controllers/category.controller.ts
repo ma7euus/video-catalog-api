@@ -15,9 +15,10 @@ import {Category} from '../models';
 import {CategoryRepository} from '../repositories';
 import {authenticate} from "@loopback/authentication";
 import {authorize} from "@loopback/authorization";
+import {PaginatorSerializer} from "../utils";
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['subscriber']})
+@authorize({allowedRoles: ['subscriber', 'video-catalog-admin']})
 export class CategoryController {
     constructor(
         @repository(CategoryRepository)
@@ -56,8 +57,8 @@ export class CategoryController {
     })
     async find(
         @param.filter(Category) filter?: Filter<Category>,
-    ): Promise<Category[]> {
-        return this.categoryRepository.find(filter);
+    ): Promise<PaginatorSerializer<Category>> {
+        return this.categoryRepository.paginate(filter);
     }
 
     @get('/categories/{id}', {

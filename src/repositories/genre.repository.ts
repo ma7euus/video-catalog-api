@@ -1,4 +1,3 @@
-import {DefaultCrudRepository} from '@loopback/repository';
 import {Genre, GenreRelations} from '../models';
 import {Esv7DataSource} from '../datasources';
 import {inject} from '@loopback/core';

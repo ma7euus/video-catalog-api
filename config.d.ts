@@ -1,4 +1,4 @@
-export declare module 'src/config' {
+export declare module 'config' {
     const rest;
     const rabbitmq;
 }
