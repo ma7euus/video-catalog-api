@@ -44,7 +44,7 @@ export class PaginatorSerializer<T = any> {
     }
 
     toJson(request: RequestContext) {
-        this.baseUrl = `${request.requestedBaseUrl}${request.request.url}`;
+        this.baseUrl = `${request.requestedBaseUrl}${request.request.url}`.split('?')[0];
         return {
             results: this.results,
             count: this.count,

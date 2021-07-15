@@ -58,6 +58,7 @@ export class CategoryController {
     async find(
         @param.filter(Category) filter?: Filter<Category>,
     ): Promise<PaginatorSerializer<Category>> {
+
         return this.categoryRepository.paginate(filter);
     }
 
