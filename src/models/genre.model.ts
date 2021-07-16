@@ -1,6 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {BaseEntity} from "./base-entity.model";
-import {RelCategoryFields} from "./category.model";
+import {Category, RelCategoryFields} from "./category.model";
 
 @model()
 export class Genre extends Entity implements BaseEntity {
@@ -45,6 +45,7 @@ export class Genre extends Entity implements BaseEntity {
         // eslint-disable-next-line @typescript-eslint/naming-convention
     updated_at: string;
 
+    @hasMany(() => Category)
     @property({
         type: 'object',
         jsonSchema: {

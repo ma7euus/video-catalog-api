@@ -1,6 +1,6 @@
 import {
     Count,
-    CountSchema,
+    CountSchema, EntityNotFoundError,
     Filter,
     FilterExcludingWhere,
     repository,
@@ -16,6 +16,7 @@ import {CategoryRepository} from '../repositories';
 import {authenticate} from "@loopback/authentication";
 import {authorize} from "@loopback/authorization";
 import {PaginatorSerializer} from "../utils";
+import {CategoryFilterBuilder} from "../filters";
 
 @authenticate('jwt')
 @authorize({allowedRoles: ['subscriber', 'video-catalog-admin']})
@@ -58,8 +59,8 @@ export class CategoryController {
     async find(
         @param.filter(Category) filter?: Filter<Category>,
     ): Promise<PaginatorSerializer<Category>> {
-
-        return this.categoryRepository.paginate(filter);
+        const newFilter = new CategoryFilterBuilder(filter).build();
+        return this.categoryRepository.paginate(newFilter);
     }
 
     @get('/categories/{id}', {
@@ -78,6 +79,16 @@ export class CategoryController {
         @param.path.string('id') id: string,
         @param.filter(Category, {exclude: 'where'}) filter?: FilterExcludingWhere<Category>
     ): Promise<Category> {
-        return this.categoryRepository.findById(id, filter);
+        const newFilter = new CategoryFilterBuilder(filter)
+            .where({
+                id,
+            })
+            .build();
+        const obj = await this.categoryRepository.findOne(newFilter);
+
+        if (!obj) {
+            throw new EntityNotFoundError(Category, id);
+        }
+        return obj;
     }
 }
