@@ -1,2 +1,2 @@
-const _chalk = require("chalk");
+const _chalk = require('chalk');
 export {_chalk as chalk};

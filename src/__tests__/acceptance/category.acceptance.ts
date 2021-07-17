@@ -1,27 +1,26 @@
 import {Client, expect} from '@loopback/testlab';
 import {clearDb, setupApplication} from './test-helper';
-import {VideoCatalogApiApplication} from "../../application";
+import {VideoCatalogApiApplication} from '../../application';
 
 describe('CategoryController', () => {
-    let app: VideoCatalogApiApplication
-    ;
-    let client: Client;
+  let app: VideoCatalogApiApplication;
+  let client: Client;
 
-    before('setupApplication', async () => {
-        ({app, client} = await setupApplication());
+  before('setupApplication', async () => {
+    ({app, client} = await setupApplication());
+  });
+
+  beforeEach(clearDb);
+
+  after(async () => {
+    await app.stop();
+  });
+
+  it('invokes GET /categories', async () => {
+    const response = await client.get('/categories').expect(200);
+    expect(response.body).to.containDeep({
+      results: [],
+      count: 0,
     });
-
-    beforeEach(clearDb);
-
-    after(async () => {
-        await app.stop();
-    });
-
-    it('invokes GET /categories', async () => {
-        const response = await client.get('/categories').expect(200);
-        expect(response.body).to.containDeep({
-            results: [],
-            count: 0,
-        });
-    });
+  });
 });

@@ -1,8 +1,8 @@
-import {DefaultFilter} from "./default.filter";
-import {Category} from "../models";
+import {DefaultFilter} from './default.filter';
+import {Category} from '../models';
 
 export class CategoryFilterBuilder extends DefaultFilter<Category> {
-    protected defaultFilter() {
-        return this.isActive(Category);
-    }
+  protected defaultFilter() {
+    return this.isActive(Category);
+  }
 }

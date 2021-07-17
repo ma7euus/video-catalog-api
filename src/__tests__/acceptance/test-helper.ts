@@ -3,7 +3,7 @@ import config from '../../../config';
 import supertest from 'supertest';
 import {Esv7DataSource} from '../../datasources';
 import dbConfig from '../../datasources/esv7.datasource.config';
-import {VideoCatalogApiApplication} from "../../application";
+import {VideoCatalogApiApplication} from '../../application';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({

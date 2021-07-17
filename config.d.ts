@@ -1,4 +1,4 @@
 export declare module 'config' {
-    const rest;
-    const rabbitmq;
+  const rest;
+  const rabbitmq;
 }

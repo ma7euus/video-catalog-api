@@ -1,83 +1,79 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
-import {BaseEntity} from "./base-entity.model";
-import {Category, RelCategoryFields} from "./category.model";
+import {BaseEntity} from './base-entity.model';
+import {Category, RelCategoryFields} from './category.model';
 
 @model()
 export class Genre extends Entity implements BaseEntity {
+  @property({
+    type: 'string',
+    id: true,
+    generated: false,
+    required: true,
+  })
+  id: string;
 
-    @property({
-        type: 'string',
-        id: true,
-        generated: false,
-        required: true,
-    })
-    id: string;
+  @property({
+    type: 'string',
+    required: true,
+    jsonSchema: {
+      minLength: 1,
+      maxLength: 255,
+    },
+  })
+  name: string;
 
-    @property({
-        type: 'string',
-        required: true,
-        jsonSchema: {
-            minLength: 1,
-            maxLength: 255
-        }
-    })
-    name: string;
+  @property({
+    type: 'boolean',
+    required: false,
+    default: true,
+  })
+  is_active: boolean;
 
-    @property({
-        type: 'boolean',
-        required: false,
-        default: true,
-    })
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-    is_active: boolean;
+  @property({
+    type: 'date',
+    required: true,
+  })
+  created_at: string;
 
-    @property({
-        type: 'date',
-        required: true
-    })
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-    created_at: string;
+  @property({
+    type: 'date',
+    required: true,
+  })
+  updated_at: string;
 
-    @property({
-        type: 'date',
-        required: true
-    })
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-    updated_at: string;
-
-    @hasMany(() => Category)
-    @property({
+  @hasMany(() => Category)
+  @property({
+    type: 'object',
+    jsonSchema: {
+      type: 'array',
+      items: {
         type: 'object',
-        jsonSchema: {
-            type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    id: {
-                        type: 'string'
-                    },
-                    name: {
-                        type: 'string'
-                    },
-                    is_active: {
-                        type: 'boolean'
-                    }
-                }
-            },
-            uniqueItems: true
-        }
-    })
-    categories: RelCategoryFields;
+        properties: {
+          id: {
+            type: 'string',
+          },
+          name: {
+            type: 'string',
+          },
+          is_active: {
+            type: 'boolean',
+          },
+        },
+      },
+      uniqueItems: true,
+    },
+  })
+  categories: RelCategoryFields;
 
-    [prop: string]: any;
+  [prop: string]: any;
 
-    constructor(data?: Partial<Genre>) {
-        super(data);
-    }
+  constructor(data?: Partial<Genre>) {
+    super(data);
+  }
 }
 
 export interface GenreRelations {
-    // describe navigational properties here
+  // describe navigational properties here
 }
 
 export type GenreWithRelations = Genre & GenreRelations;
