@@ -13,6 +13,7 @@
   "scripts": {
     "build": "lb-tsc",
     "build:watch": "lb-tsc --watch",
+    "clean": "lb-clean dist *.tsbuildinfo",
     "lint": "npm run prettier:check && npm run eslint",
     "lint:fix": "npm run eslint:fix && npm run prettier:fix",
     "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
@@ -27,10 +28,9 @@
     "docker:build": "docker build -t video-catalog-api .",
     "docker:run": "docker run -p 3000:3000 -d video-catalog-api",
     "migrate": "node ./dist/migrate",
-    "openapi-spec": "node ./dist/openapi-spec",
     "prestart": "npm run build",
     "start": "node -r source-map-support/register .",
-    "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
+    "prepublishOnly": "npm run test",
     "console": "node dist/console.js"
   },
   "repository": {

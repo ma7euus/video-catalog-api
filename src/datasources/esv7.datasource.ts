@@ -1,5 +1,4 @@
 import {
-  inject,
   lifeCycleObserver,
   LifeCycleObserver,
   ValueOrPromise,
