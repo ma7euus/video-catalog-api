@@ -15,4 +15,4 @@ if [ ! -f ".env" ]; then
 fi
 
 ## run server
-npx nodemon -L
+nodemon -L

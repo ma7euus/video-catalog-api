@@ -75,3 +75,5 @@ typings/
 .docker/elasticdata
 
 .devcontainer
+
+package-lock.json

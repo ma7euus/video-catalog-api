@@ -1,3 +1,4 @@
+import './../../bootstrap';
 import {givenHttpServerConfig, Client} from '@loopback/testlab';
 import config from '../../../config';
 import supertest from 'supertest';
